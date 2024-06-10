@@ -1,0 +1,7 @@
+.eslintrc.js
+package.json
+package-lock.json
+dist/
+lib/
+./types/
+.lintstagedrc
