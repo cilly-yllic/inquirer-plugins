@@ -170,7 +170,7 @@ export class TablePlugin extends Base {
     if (state) {
       return this.done({
         state,
-        result: this.table.getResult(),
+        result: this.getCurrentValues(),
       })
     } else {
       return this.done({
