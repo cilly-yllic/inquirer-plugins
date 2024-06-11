@@ -10,7 +10,7 @@ import { map } from 'rxjs/operators'
 
 import { Done } from '~types/inquirer.js'
 import { dim, error } from '~utils/chalk.js'
-import { getKeypressValue } from '~utils/keypress.js'
+import { getKeypressValue, getBackspaceText } from '~utils/keypress.js'
 
 import { TableClass } from './table/table.js'
 import { DEFAULT_OPTIONS, RequiredOptions, TableQuestion } from './table/types.js'
@@ -31,6 +31,7 @@ export class TablePlugin extends Base {
   }
   editing = false
   temporaryBackup: string | null = null
+  purTyping = ''
   answers: Answers = []
 
   constructor(question: Question<TableQuestion>, readLine: ReadLineInterface, answers: Answers) {
@@ -51,7 +52,7 @@ export class TablePlugin extends Base {
   }
 
   getCurrentValues() {
-    return this.table.getResult()
+    return this.table.getResult(this.answers)
   }
 
   isEditable(index: number) {
@@ -97,6 +98,7 @@ export class TablePlugin extends Base {
           default:
             if (this.isEditable(this.pointerIndexes.column)) {
               this.editing = true
+              this.clear()
               this.onEditPress(key)
             }
         }
@@ -159,11 +161,11 @@ export class TablePlugin extends Base {
 
   clear() {
     this.temporaryBackup = null
+    this.purTyping = ''
   }
 
   onEnd(state: any) {
     this.render(true)
-    this.clear()
     this.status = 'answered'
     this.screen.done()
     cliCursor.show()
@@ -184,7 +186,6 @@ export class TablePlugin extends Base {
   }
 
   onError(_state: any) {
-    this.clear()
     if (this.editing) {
       this.editing = false
       this.render()
@@ -197,10 +198,8 @@ export class TablePlugin extends Base {
     }
   }
 
-  validateValue() {}
-
   updateChoice(value: string) {
-    this.table.updateRow(this.pointerIndexes.row, this.pointerIndexes.column, value)
+    return this.table.updateRow(this.pointerIndexes.row, this.pointerIndexes.column, value, this.answers)
   }
 
   get currentValue() {
@@ -208,30 +207,32 @@ export class TablePlugin extends Base {
   }
 
   onEditPress(key: Key) {
-    let value = this.currentValue
     if (this.temporaryBackup === null) {
-      this.temporaryBackup = value
-      value = ''
+      this.temporaryBackup = this.currentValue
     }
+    let value = this.purTyping
     switch (key.name) {
       case 'escape':
-        this.updateChoice(this.temporaryBackup)
+        this.purTyping = ''
+        value = this.temporaryBackup
         this.editing = false
         break
       case 'delete':
-        this.updateChoice('')
+        this.purTyping = ''
+        value = this.purTyping
         break
       case 'backspace': {
-        let currentValue = value
-        currentValue = currentValue.slice(0, -1)
-        this.updateChoice(currentValue)
+        this.purTyping = getBackspaceText(this.purTyping)
+        value = this.purTyping
         break
       }
       default:
-        this.updateChoice(`${value}${getKeypressValue(key)}`)
+        this.purTyping = `${this.purTyping}${getKeypressValue(key)}`
+        value = this.purTyping
         break
     }
-    this.render()
+    const message = this.updateChoice(value)
+    this.render(false, message)
   }
 
   getShowRowIndex() {
@@ -256,7 +257,7 @@ export class TablePlugin extends Base {
     return isEditable ? this.options.colors.editable(value) : this.options.colors.selected(value)
   }
 
-  render(isDisconnect = false) {
+  render(isDisconnect = false, message = '') {
     let content = this.getQuestion()
     let bottomContent: string | ChalkInstance = ''
 
@@ -274,7 +275,10 @@ export class TablePlugin extends Base {
       for (let ii = 0; ii < (this.table.rows[i] || []).length; ii++) {
         const isEditable = this.isEditable(ii)
         const value = this.table.rows[i][ii]
-        columnValues.push(this.getColor(value, this.isSelected(i, ii), isEditable))
+        const parser = this.table.getParser(ii)
+        columnValues.push(
+          this.getColor(parser(value, this.table.getRaw(), this.answers), this.isSelected(i, ii), isEditable)
+        )
       }
       table.push(columnValues)
     }
@@ -293,7 +297,9 @@ export class TablePlugin extends Base {
     if (this.isNextCloses.escape) {
       bottomContent = this.options.escapeMessage
     }
-
+    if (message) {
+      bottomContent = message
+    }
     this.screen.render(content, bottomContent as string)
   }
 }

@@ -14,3 +14,10 @@ export const getKeypressValue = (key: Key) => {
       return key.sequence
   }
 }
+
+export const getBackspaceText = (str: string) => {
+  if (!str) {
+    return ''
+  }
+  return str.slice(0, -1)
+}

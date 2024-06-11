@@ -1,4 +1,5 @@
 import chalk, { ChalkInstance } from 'chalk'
+import { Answers } from 'inquirer'
 
 import { ParseType } from '~types/parse-types.js'
 import { hop, success, warn } from '~utils/chalk.js'
@@ -64,8 +65,10 @@ export interface Column {
   name: string | ChalkInstance
   value: string
   type: ParseType
-  validate?: (input: string) => boolean
-  parser?: (input: any) => any
+  validate?: (input: string, raws: RawInputs, answers: Answers) => ValidateResult
+  parser?: (input: any, raws: RawInputs, answers: Answers) => any
 }
 
 export type Cell = number | string | boolean
+
+export type RawInputs = Record<string, string>[]

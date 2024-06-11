@@ -1,6 +1,6 @@
 {
   "name": "inquirer-plugins",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -16,16 +16,19 @@
     "generate": "tsx --tsconfig ./tsconfig.tsx.json ./tools/generate-alias.zx.ts",
     "ci:update-version": "tsx --tsconfig ./tsconfig.tsx.json ./tools/update-version.zx.ts",
     "md:generate": "tsx --tsconfig ./tsconfig.tsx.json ./tools/generate-md.ts",
+
     "//--- test ---//": "",
     "test": "run-s test:*",
     "test:lint": "npm run lint",
     "test:prettier": "npm run prettier:check",
+
     "//--- build ---//": "",
     "build": "run-s build:*",
     "build:test": "npm run test",
     "build:clean": "npm run clean",
     "build:tsc": "npm run tsc",
     "build:generate": "npm run generate",
+
     "//--- publish ---//": "",
     "publish:build": "run-s build:{clean,tsc,generate}",
     "dry-run": "tsx --tsconfig ./tsconfig.tsx.json ./src/_internal/plugins/test.ts"
@@ -36,6 +39,20 @@
   "engines": {
     "node": ">=19.0.0"
   },
+  "keywords": [
+    "answer",
+    "answers",
+    "ask",
+    "confirm",
+    "generator",
+    "input",
+    "inquire",
+    "inquirer",
+    "prompt",
+    "prompts",
+    "table",
+    "question"
+  ],
   "exports": {
     ".": "./dist/**/*.js",
     "./table": "./dist/modules/table.js",
@@ -51,6 +68,7 @@
     "cli-cursor": "^4.0.0",
     "cli-table3": "^0.6.5",
     "inquirer": "^9.2.23",
+    "my-gadgetry": "^1.2.5",
     "zx": "^8.1.2"
   },
   "devDependencies": {
@@ -66,7 +84,6 @@
     "eslint-plugin-unused-imports": "^3.2.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.5",
-    "my-gadgetry": "^1.2.5",
     "npm-run-all2": "^6.2.0",
     "prettier": "^3.3.1",
     "tsc-alias": "^1.8.10",
