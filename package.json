@@ -1,8 +1,16 @@
 {
   "name": "inquirer-plugins",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "main": "index.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cilly-yllic/inquirer-plugins.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cilly-yllic/inquirer-plugins/issues"
+  },
+  "homepage": "https://github.com/cilly-yllic/inquirer-plugins#readme",
   "scripts": {
     "prepare": "husky",
     "lint": "eslint .",
