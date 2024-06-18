@@ -1,6 +1,6 @@
 {
   "name": "inquirer-plugins",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "main": "index.js",
   "type": "module",
   "repository": {
